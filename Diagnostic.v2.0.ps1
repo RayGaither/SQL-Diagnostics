@@ -1,49 +1,69 @@
-﻿#Provide server name and all active instances will scan
-$serverName = "EXPSQL22"
+﻿#Source
+$sourceServer = "EXPSQL22"
+$database = "master"
+
+# Provide SQL Server connection to Source database server
+$SourceDBconnString = "Server=$sourceServer;Database=$database;Integrated Security=True"
+
+#Provide server name and all active sourceInstances will scan
+#$sourceServer = "EXPSQL22"
 $queryOutputPath = 'C:\Users\argaither\Documents\Diags' #  <--- is the path correct
 
-# get list of instances on server
-$instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
-# Loop through each server instanceForEach ($instance in $instanceList)         {        if ($instance.InstanceName -ne "MSSQLSERVER"){                $serverInstanceName = "$($serverName)\$($instance)"                $serverInstanceName = $serverInstanceName -replace ("@{InstanceName=|}")
+# get list of sourceInstances on server
+$sourceInstanceList = Get-DbaService -Computername $sourceServer | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
+# Loop through each server sourceInstanceForEach ($sourceInstance in $instanceList)         {        if ($sourceInstance.InstanceName -ne "MSSQLSERVER"){                $serversourceInstanceName = "$($sourceServer)\$($sourceInstance)"                $serversourceInstanceName = $serversourceInstanceName -replace ("@{InstanceName=|}")
         }else{
-                $serverInstanceName = $serverName            
+                $serversourceInstanceName = $sourceServer            
         }
             
-#$serverInstanceName
+#$serversourceInstanceName
 #}
 
         try 
             {
    
-            #test if instance can be connected, if not go to next instance
-            $server = Connect-DbaInstance -SqlInstance $serverInstanceName -TrustServerCertificate -ClientName $serverInstanceName  #"SQL5\FIRECHECK\DBATools"
+            #test if sourceInstance can be connected, if not go to next sourceInstance
+            $server = Connect-DbaInstance -SqlInstance $serversourceInstanceName -TrustServerCertificate -ClientName $serversourceInstanceName  #"SQL5\FIRECHECK\DBATools"
             
            # $queryOutputPath = 'C:\Users\rgaither\Documents\GB\DiagQuerriesPostSAN' #  <--- is the path correct
 	        
-# csv version            $resultsOutputPath = "$($queryOutputPath)\results\$($serverInstanceName)_diag.xlsx"
+# csv version            $resultsOutputPath = "$($queryOutputPath)\results\$($serversourceInstanceName)_diag.xlsx"
     	 
-            # create all the diag querries for this instance
+            # create all the diag querries for this sourceInstance
                # instance only
-#            Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -InstanceOnly
+#            Invoke-DbaDiagnosticQuery -SqlInstance $serversourceInstanceName -ExportQueries -OutputPath $queryOutputPath -InstanceOnly
                # all user databases only
-#            Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -DatabaseSpecific
+#            Invoke-DbaDiagnosticQuery -SqlInstance $serversourceInstanceName -ExportQueries -OutputPath $queryOutputPath -DatabaseSpecific
 
 	 
 	        $scriptList = Get-ChildItem "$($queryOutputPath)\*.sql"
-	        # loop through each diag query for instance
+	        # loop through each diag query for sourceInstance
 	        foreach ($script in $scriptList) 
                 {
-	              # Name file for CSV
-$resultsOutputPath = "$($queryOutputPath)\results\$($serverName)-$($instance.InstanceName)-$($script.Name)_diag.csv"                  
-                    
-	             $name = $script.BaseName -replace "(?:^|_|-|\s|\s-\s)(\p{L}) ", '' #{ $_.Groups.Value.ToUpper() }
-                 
 
+                    #get each script name without the extention for table name
+# $script = "Configuration Values.sql"     
+                    $tablename = $script -replace ".sql",""
+                    $tablename = $tablename -replace " ", ""
+                   
+
+                    # Read the SQL script file contents
+                    $sqlDiagScript = $($queryOutputPath)+"\"+$($script)
+                    $sqlDiagScript = Get-content $sqlDiagScript -Raw
+
+                    	# Create SQL connection and command objects                    $connection = New-Object System.Data.SqlClient.SqlConnection($TargetDBconnString)                    $command = New-Object System.Data.SqlClient.SqlCommand($sqlDiagScript, $connection)
+
+ 
+ 
+ 
+ 
+ 
+ 
                  # Strip Server Name
-	             $name = $name -replace $serverName, ''
-                 $name = $name -replace $instance, ''   
+	             $name = $name -replace $sourceServer, ''
+                 $name = $name -replace $sourceInstance, ''   
                  #spaces not allowed in table name in excel
-                 $tblname = $name -replace " ", ''   
+                 #$tblname = $name -replace " ", ''   
 
 	              
 	              # Truncate name if over length requirements
@@ -53,13 +73,13 @@ $resultsOutputPath = "$($queryOutputPath)\results\$($serverName)-$($instance.Ins
                   $fn = $queryOutputPath + '\' + $script.name 
 	 	    
                  # Invoke-DbaQuery -SqlInstance $server -File $fn | Export-Excel -Path $resultsOutputPath -TableName $tblname -WorksheetName $name -AutoSize -AutoFilter -ClearSheet
-                 Invoke-DbaQuery -SqlInstance $server -File $fn | Export-CSV -Path $resultsOutputPath -NoTypeInformation
+                 # Invoke-DbaQuery -SqlInstance $server -File $fn | Export-CSV -Path $resultsOutputPath -NoTypeInformation
                 } #end query loop, clean folder out
 #                Get-ChildItem -Path "$($queryOutputPath)" *.sql -File -Recurse | foreach { $_.Delete()}
             }
         catch
             {
             #Do nothing
-            Write-Host $serverInstanceName " Is not online"
-            } # end instance loop
+            Write-Host $serversourceInstanceName " Is not online"
+            } # end sourceInstance loop
 }  
