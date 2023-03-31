@@ -3,7 +3,13 @@ $serverName = "EXPSQL22"
 
 # get list of instances on server
 $instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
-# Loop through each server instance#ForEach ($Instance in $instanceList)  #       {  #      if ($Instance.InstanceName -ne "MSSQLSERVER"){   #             $serverInstanceName = "$($serverName)\$($Instance)" #               $serverInstanceName = $serverInstanceName -replace ("@{InstanceName=|}")
+
+# Loop through each server instance
+#ForEach ($Instance in $instanceList) 
+ #       {
+  #      if ($Instance.InstanceName -ne "MSSQLSERVER"){
+   #             $serverInstanceName = "$($serverName)\$($Instance)"
+ #               $serverInstanceName = $serverInstanceName -replace ("@{InstanceName=|}")
   #      }else{
    #             $serverInstanceName = $serverName            
     #    }
