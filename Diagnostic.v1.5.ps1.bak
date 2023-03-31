@@ -2,7 +2,7 @@
 $serverName = "EXPSQL22"
 
 # get list of instances on server
-$instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
+#$instanceList = Get-DbaService -Computername $serverName -Credential hi\argaither | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
 
 # Loop through each server instance
 #ForEach ($Instance in $instanceList) 
@@ -24,13 +24,13 @@ $instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -lik
             #test if instance can be connected, if not go to next instance
             $server = Connect-DbaInstance -SqlInstance $serverInstanceName -TrustServerCertificate #-ClientName $serverInstanceName  #"SQL5\FIRECHECK\DBATools"
             
-            $queryOutputPath = 'C:\Users\argaither\Documents\Diags' #  <--- is the path correct
+            $queryOutputPath = 'C:\Diag' #  <--- is the path correct
 	        
-            $resultsOutputPath = "$($queryOutputPath)\results\$($serverInstanceName)_diag.xlsx"
+            $resultsOutputPath = "$($queryOutputPath)\results\$($serverInstanceName)_diag.csv"
     	 
-            # create all the diag querries for this instance
+          # create all the diag querries for this instance
                # instance only
-           # Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -InstanceOnly
+            Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -InstanceOnly
                # all user databases only
 #            Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -DatabaseSpecific
 
@@ -44,13 +44,13 @@ $instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -lik
                   
                     
 	             $name = $script.BaseName -replace "(?:^|_|-|\s|\s-\s)(\p{L}) ", '' #{ $_.Groups.Value.ToUpper() }
-                 
+               $resultsOutputPath = "$($queryOutputPath)\results\$($serverInstanceName)$($name)_diag.csv"  
 
                  # Strip Server Name
-	             $name = $name -replace $serverName, ''
+	               $name = $name -replace $serverName, ''
                  $name = $name -replace $instance, ''   
                  #spaces not allowed in table name in excel
-                 $tblname = $name -replace " ", ''   
+                 #$tblname = $name -replace " ", ''   
 
 	              
 	              # Truncate name if over length requirements
@@ -70,4 +70,4 @@ $instanceList = Get-DbaService -Computername $serverName | ?{$_.displayname -lik
           #  } # end instance loop
 #}  #Instance Loop
 
-$PSVersionTable
+#$PSVersionTable
