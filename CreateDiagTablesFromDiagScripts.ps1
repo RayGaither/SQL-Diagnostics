@@ -24,7 +24,7 @@ If ($createScripts)
 {
     # create all the diag querries for this instance
     # instance only
- #   Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $diagSQLPath -InstanceOnly
+ #   Invoke-DbaDiagnosticQuery -SqlInstance $subjectServer -ExportQueries -OutputPath $diagSQLPath #-InstanceOnly
     # all user databases only
     # Invoke-DbaDiagnosticQuery -SqlInstance $serverInstanceName -ExportQueries -OutputPath $queryOutputPath -DatabaseSpecific
 }
@@ -50,17 +50,18 @@ $scriptList = Get-ChildItem "$($diagSQLPath)\*.sql"
         $sqlScriptPath = $diagSQLPath + '\' + $script.Name
         
         # have to get script into var to pass to SQL SP
-        $sqlScript = Get-Content $sqlScriptPath -Raw 
+       # $sqlScript = Get-Content $sqlScriptPath -Raw 
+       # $sqlScript = $sqlScript -replace  "'", "'`'"
 
         
-        $sqlFtnCall = "select dbo.ftnGenerateDiagTable($sqlScript, $tableName) as MyResult"
+       # $sqlFtnCall = "select dbo.ftnGenerateDiagTable$($sqlScript, $tableName) as $($MyResult)"
         
         # go to dba server to build table ddl - returns table ddl
-        Invoke-DbaQuery -SqlInstance $dbaServer -Database $dbaDatabase -Query $sqlFtnCall 
-        Write-Output MyResult
+       # Invoke-DbaQuery -SqlInstance $dbaServer -Database $dbaDatabase -Query $sqlFtnCall 
+      #  Write-Output $MyResult
 
         # go back to DBA server to create table
-
+       # "SELECT * FROM myTable WHERE myColumn = 'It`s a single quote'"
 
     }
 
