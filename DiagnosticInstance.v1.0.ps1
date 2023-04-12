@@ -7,20 +7,20 @@ $SourceDBconnString = "Server=$sourceServer;Database=$database;Integrated Securi
 
 #Provide server name and all active sourceInstances will scan
 #$sourceServer = "EXPSQL22"
-$queryOutputPath = 'C:\Users\argaither\Documents\Diags' #  <--- is the path correct
+$queryPath = 'C:\Users\argaither\Documents\Diag\TestScripts' #  <--- is the path correct
 
 # get list of sourceInstances on server
-$sourceInstanceList = Get-DbaService -Computername $sourceServer | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
+#$sourceInstanceList = Get-DbaService -Computername $sourceServer | ?{$_.displayname -like "SQL Server (*"} | select InstanceName
 
 # Loop through each server sourceInstance
-ForEach ($sourceInstance in $instanceList) 
-        {
-        if ($sourceInstance.InstanceName -ne "MSSQLSERVER"){
-                $serversourceInstanceName = "$($sourceServer)\$($sourceInstance)"
-                $serversourceInstanceName = $serversourceInstanceName -replace ("@{InstanceName=|}")
-        }else{
-                $serversourceInstanceName = $sourceServer            
-        }
+#ForEach ($sourceInstance in $instanceList) 
+ #       {
+  #      if ($sourceInstance.InstanceName -ne "MSSQLSERVER"){
+  #              $serversourceInstanceName = "$($sourceServer)\$($sourceInstance)"
+  #              $serversourceInstanceName = $serversourceInstanceName -replace ("@{InstanceName=|}")
+  #      }else{
+  #              $serversourceInstanceName = $sourceServer            
+  #      }
             
 #$serversourceInstanceName
 #}
@@ -46,11 +46,10 @@ ForEach ($sourceInstance in $instanceList)
 	        # loop through each diag query for sourceInstance
 	        foreach ($script in $scriptList) 
                 {
-
                     #get each script name without the extention for table name
 # $script = "Configuration Values.sql"     
-                    $tablename = $script -replace ".sql",""
-                    $tablename = $tablename -replace " ", ""
+                  #  $tablename = $script -replace ".sql",""
+                  #  $tablename = $tablename -replace " ", ""
                    
 
                     # Read the SQL script file contents
@@ -84,10 +83,10 @@ ForEach ($sourceInstance in $instanceList)
                  # Invoke-DbaQuery -SqlInstance $server -File $fn | Export-CSV -Path $resultsOutputPath -NoTypeInformation
                 } #end query loop, clean folder out
 #                Get-ChildItem -Path "$($queryOutputPath)" *.sql -File -Recurse | foreach { $_.Delete()}
-            }
-        catch
-            {
+         #   }
+       # catch # instance loop
+        #    {
             #Do nothing
-            Write-Host $serversourceInstanceName " Is not online"
-            } # end sourceInstance loop
+        #    Write-Host $serversourceInstanceName " Is not online"
+   #         } # end sourceInstance loop
 }  
