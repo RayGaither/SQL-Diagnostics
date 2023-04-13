@@ -9,11 +9,11 @@
 $createDiagScripts = $true
 
 # Set path and file name for server/instance list
-$listPath = 'C:\Users\argaither\HubbellHealthCheck\\'
+$listPath = 'C:\Users\argaither\HubbellHealthCheck'
 $listFile = 'SQL2019InstanceList.txt'
 
 # Open server/instance list and loop through them
-$instanceList = get-content -path $listPath + $listFile
+$instanceList = get-content -path "$($listPath)\$($listFile)"
 
 # Loop through each server instance
 ForEach ($Instance in $instanceList) {
