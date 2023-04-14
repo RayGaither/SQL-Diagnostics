@@ -22,6 +22,7 @@ ForEach ($Instance in $instanceList) {
 			# $serverConn | Disconnect-DbaInstance
 			
 			$serverConn = Connect-DbaInstance -SqlInstance $Instance -TrustServerCertificate
+			
 			if ($null -eq $serverConn) {
 				
 				if($createDiagScripts) {
