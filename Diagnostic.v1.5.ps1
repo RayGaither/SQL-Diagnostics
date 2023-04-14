@@ -6,7 +6,7 @@
 # Diag files will be script name with no spaces or file extentions
 
 # create boolean set to true to create the diag files once.  All servers in list are same version
-$createDiagScripts = $False	
+$createDiagScripts = $true	
 # $wincred = Get-Credential
 # Set path and file name for server/instance list
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
