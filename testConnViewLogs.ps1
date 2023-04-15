@@ -30,7 +30,7 @@ $log | Format-Table -AutoSize
 # In addition, when using dbatools, you can use the Invoke-DbaQuery cmdlet with the -SqlInstance parameter to query the SQL Server error log. For example:
 
 # powershell
-
+#Set-Item WSMan:\localhost\Client\TrustedHosts -Value ''-Concatenate
 # Connect to the SQL Server instance using dbatools
 Connect-DbaInstance -SqlInstance "localhost"
 

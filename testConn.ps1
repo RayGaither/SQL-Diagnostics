@@ -1,5 +1,5 @@
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
-$listFile = 'SQL2019InstanceList.txt'
+$listFile = 'SQL2016InstanceList.txt'
 
 # Open server/instance list and loop through them
 $instanceList = get-content -path "$($listPath)\$($listFile)"
@@ -7,7 +7,9 @@ $instanceList = get-content -path "$($listPath)\$($listFile)"
 # Loop through each server instance
 ForEach ($Instance in $instanceList) {
 	# connect to instance
+   write-output "instance: $Instance"
 	 try {
+         write-output "try: $Instance"
 			$serverConn = Connect-DbaInstance -SqlInstance $Instance -TrustServerCertificate
             Write-Output "Get-DbaConnectedInstance"
             $serverConn | Disconnect-DbaInstance
@@ -15,7 +17,7 @@ ForEach ($Instance in $instanceList) {
             
      }
      catch{
-        Write-Output "Get-DbaConnectedInstance"  
+        Write-Output "conn catch"  
      }
     }    
     	

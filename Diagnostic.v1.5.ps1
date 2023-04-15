@@ -1,4 +1,4 @@
-﻿# This version will use a list to connect to all servers of a certain version
+# This version will use a list to connect to all servers of a certain version
 # Create the diag scripts once
 # Run scrits on each instance and save to excel
 # Workbooks will be named as ServerInstance name
@@ -6,7 +6,7 @@
 # Diag files will be script name with no spaces or file extentions
 
 # create boolean set to true to create the diag files once.  All servers in list are same version
-$createDiagScripts = $False	
+$createDiagScripts = $true	
 # $wincred = Get-Credential
 # Set path and file name for server/instance list
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
@@ -22,6 +22,7 @@ ForEach ($Instance in $instanceList) {
 			# $serverConn | Disconnect-DbaInstance
 			
 			$serverConn = Connect-DbaInstance -SqlInstance $Instance -TrustServerCertificate
+			
 			if ($null -eq $serverConn) {
 				
 				if($createDiagScripts) {
