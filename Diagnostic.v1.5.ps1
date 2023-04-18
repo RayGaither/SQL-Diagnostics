@@ -10,7 +10,7 @@ $createDiagScripts = $true
 # $wincred = Get-Credential
 # Set path and file name for server/instance list
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
-$listFile = 'SQL2016InstanceList.txt'
+$listFile = 'SQL2017InstanceList.txt'
 
 # Open server/instance list and loop through them
 $instanceList = get-content -path "$($listPath)\$($listFile)"
@@ -19,11 +19,13 @@ $instanceList = get-content -path "$($listPath)\$($listFile)"
 ForEach ($Instance in $instanceList) {
 	# connect to instance
 	 try {
-			# $serverConn | Disconnect-DbaInstance
+			Get-DbaConnectedInstance | Disconnect-DbaInstance
+            $serverConn = ""
+          #  Write-Output "Serverconn is: $serverConn"
 			
 			$serverConn = Connect-DbaInstance -SqlInstance $Instance -TrustServerCertificate
 			
-			if ($null -eq $serverConn) {
+			if ($serverConn -ne $null) {
 				
 				if($createDiagScripts) {
 					$createDiagScripts = $False
@@ -47,13 +49,21 @@ ForEach ($Instance in $instanceList) {
 					if ($name.Length -gt 25) {$name = $name.Substring(0,25)}
 					
 					# write diagnostic results to excel tab
+           # Write-Output "Serverconn is: $serverConn"
+           # Write-Output "file name is: $fn"
+           # Write-Output "path is: $resultsOutputPath"
+           # Write-Output "table name is: $tblname"
+
+
 					Invoke-DbaQuery -SqlInstance $serverConn -File $fn | Export-Excel -Path $resultsOutputPath -TableName $tblname -WorksheetName $tblname -AutoSize -AutoFilter -ClearSheet
+                    
 				} # end Diag Script Loop
 				Write-Output "1 Not able to connect to: $($Instance) "
 			} # end connect if test	and go to next instance
 		} # end try
 		catch {
 				Write-Output "2 Not able to connect to: $($Instance) "
+                Write-Output "Error is: $error"
                 
 		} # End catch
 		
