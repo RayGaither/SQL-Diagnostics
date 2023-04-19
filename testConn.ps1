@@ -1,5 +1,5 @@
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
-$listFile = 'SQL2017InstanceList.txt'
+$listFile = 'SQL2014InstanceList.txt'
 
 # Open server/instance list and loop through them
 $instanceList = get-content -path "$($listPath)\$($listFile)"
@@ -11,9 +11,12 @@ ForEach ($Instance in $instanceList) {
    try {
       write-output "try: $Instance"
       $serverConn = Connect-DbaInstance -SqlInstance $Instance -TrustServerCertificate
-      Write-Output "Get-DbaConnectedInstance"
-      $serverConn | Disconnect-DbaInstance
-      Write-Output "Get-DbaConnectedInstance"            
+      if ($serverConn -ne $null) {
+        $cn = Get-DbaConnectedInstance
+        Write-Output "Instance connected: $cn"
+        $serverConn | Disconnect-DbaInstance
+        Write-Output "Get-DbaConnectedInstance"            
+        }
    }
    catch {
       Write-Output "Blew up: $error"  
@@ -24,3 +27,7 @@ ForEach ($Instance in $instanceList) {
 # Get-DbaConnectedInstance
 # Connect-DbaInstance -SqlInstance EXP92SQLT -TrustServerCertificate
 # $error = ""
+
+# Connect-DbaInstance -SqlInstance 'JUAMXSQL02,1433' -TrustServerCertificate
+
+# Get-DbaConnectedInstance | Disconnect-DbaInstance
