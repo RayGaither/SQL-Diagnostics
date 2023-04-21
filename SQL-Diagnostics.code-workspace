@@ -8,5 +8,10 @@
 	"launch": {
 		"version": "0.2.0",
 		"configurations": []
+	},
+	"extensions": {
+		"recommendations": [
+			"mhutchie.git-graph"
+		]
 	}
 }

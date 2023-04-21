@@ -24,3 +24,5 @@ ForEach ($Instance in $instanceList) {
 # Get-DbaConnectedInstance
 # Connect-DbaInstance -SqlInstance EXP92SQLT -TrustServerCertificate
 # $error = ""
+# Connect-DbaInstance -SqlInstance "SOMDEVSQL01\CMX_COMMERCIAL,55539" -TrustServerCertificate
+
