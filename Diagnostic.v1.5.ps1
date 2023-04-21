@@ -10,7 +10,7 @@ $createDiagScripts = $true
 # $wincred = Get-Credential
 # Set path and file name for server/instance list
 $listPath = 'C:\Users\argaither\HubbellHealthCheck'
-$listFile = 'SQL2017InstanceList.txt'
+$listFile = 'SQL20xxInstanceList.txt'
 
 # Open server/instance list and loop through them
 $instanceList = get-content -path "$($listPath)\$($listFile)"
@@ -29,14 +29,17 @@ ForEach ($Instance in $instanceList) {
 				
 				if($createDiagScripts) {
 					$createDiagScripts = $False
+                    Get-ChildItem -Path "$($queryOutputPath)" *.sql -File -Recurse | foreach { $_.Delete()}
 					# delete folder content before creating new scripts
 					$queryOutputPath = 'C:\Users\argaither\Documents\Diag\Instance_Diags' #  <--- is the path correct
 					# instance only
 					Invoke-DbaDiagnosticQuery -SqlInstance $serverConn -ExportQueries -OutputPath $queryOutputPath -InstanceOnly
 				} # end if
-				
+				$spreadsheetName = $instance -replace "\\", "_"
+                $spreadsheetName = $spreadsheetName.Split(',')[0]
+
 				# use instance name for workbook name
-				$resultsOutputPath = "$($queryOutputPath)\results\$($Instance)_diag.xlsx"  
+				$resultsOutputPath = "$($queryOutputPath)\results\$($spreadsheetName)_diag.xlsx"  
 					
 				# loop through diagnostic scripts
 				$scriptList = Get-ChildItem "$($queryOutputPath)\*.sql"
@@ -58,7 +61,7 @@ ForEach ($Instance in $instanceList) {
 					Invoke-DbaQuery -SqlInstance $serverConn -File $fn | Export-Excel -Path $resultsOutputPath -TableName $tblname -WorksheetName $tblname -AutoSize -AutoFilter -ClearSheet
                     
 				} # end Diag Script Loop
-				Write-Output "1 Not able to connect to: $($Instance) "
+				Write-Output "Completed Sxripts for : $($Instance)"
 			} # end connect if test	and go to next instance
 		} # end try
 		catch {
